@@ -511,9 +511,7 @@ class RPGDAO:
             for data in data_tuples:
                 data_array[0][count_tuple] += (data,)
                 count_tuple += 1
-                
-        for i in range(0, len(data_array)):
-            data_dict = dict(data_array[i])
-            data_array[i] = data_dict
-            
+        
+        data_array = [dict(data) for data in data_array]
+                    
         return data_array
