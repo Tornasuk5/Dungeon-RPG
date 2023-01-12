@@ -25,10 +25,6 @@ class Character(Entity):
     def name(self):
         return self._name
 
-    @name.setter
-    def name(self, name):
-        self._name = name
-
     @property
     def character_class(self):
         return self._character_class
@@ -45,14 +41,25 @@ class Character(Entity):
     def floor_level(self):
         return self._floor_level
     
+    @name.setter
+    def name(self, name):
+        self._name = name
+    
     @luck.setter
     def luck(self, luck):
         self._luck = luck
+        
+    @abilities.setter
+    def abilities(self, abilities):
+        self._abilities = abilities
     
     @floor_level.setter
     def floor_level(self, floor_level):
         self._floor_level = floor_level
-
+        
+    #-------------------------
+    # Gets character's full HP
+    #-------------------------
     def get_full_hp(self):
         if self._character_class == "Archer": full_hp = math.ceil((50 + (50 * self.level * 0.5)))
         elif self._character_class == "Mage": full_hp = math.ceil((50 + (50 * self.level * 0.25)))
@@ -61,9 +68,15 @@ class Character(Entity):
 
         return full_hp
     
+    #-------------------------
+    # Gets character's full MP
+    #-------------------------
     def get_full_mp(self):
         return math.ceil((25 + (25 * self.level * 0.75)))
     
+    #------------------------------
+    # Gets character's full stamina
+    #------------------------------
     def get_full_stamina(self):
         if self._character_class == "Archer": full_stamina = math.ceil((25 + (25 * self.level * 0.5)))
         elif self._character_class == "Rogue": full_stamina = math.ceil((25 + (25 * self.level * 0.6)))
@@ -71,11 +84,13 @@ class Character(Entity):
 
         return full_stamina
     
-
+    #------------------
+    # Character attacks
+    #------------------
     def character_attack(self, monster):
         dodge_random = random.randint(0, 100)
         
-        if dodge_random <= monster.dodge: print(f"{monster.monster_type} DODGE your attack!")
+        if dodge_random <= monster.dodge: print(f"\n{monster.monster_type} DODGE your attack!")
         
         else:
             damage = self.attack - monster.defense
@@ -86,22 +101,29 @@ class Character(Entity):
                 
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
-                    print("CRITICAL DAMAGE!")
+                    print("\nCRITICAL DAMAGE!")
                     
                 monster.hp = monster.hp - damage
             
             else: damage = 0
             
-            print(f"{self._name} deals {damage} damage to {monster.monster_type}")
-            time.sleep(1)
+            print(f"\n{self._name} deals {damage} damage to {monster.monster_type}")
             
+        time.sleep(1)
             
+    #--------------------------
+    # Character uses an ability
+    #--------------------------
     def character_ability(self, ability, monster):
-        self.cast_ability(ability.resources_cost)
+        ability_cost = ability.resources_cost
+        if self._character_class == "Archer": self.stamina -= ability_cost
+        elif self._character_class == "Mage": self.mp -= ability_cost
+        elif self._character_class == "Rogue": self.stamina -= ability_cost
+        elif self._character_class == "Warrior": self.stamina -= ability_cost
         
         dodge_random = random.randint(0, 100)
         
-        if dodge_random <= monster.dodge: print(f"{monster.monster_type} DODGE your attack!")
+        if dodge_random <= monster.dodge: print(f"\n{monster.monster_type} DODGE your attack!")
         
         else:
             damage = ability.attack_power - monster.defense
@@ -112,16 +134,19 @@ class Character(Entity):
                 
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
-                    print("CRITICAL DAMAGE!")
+                    print("\nCRITICAL DAMAGE!")
                 
                 monster.hp = monster.hp - damage
                 
             else: damage = 0
 
-            print(f"{self._name} use '{ability.name}' and deals {damage} damage to {monster.monster_type}")
-            time.sleep(1)
+            print(f"\n{self._name} use '{ability.name}' and deals {damage} damage to {monster.monster_type}")
             
-
+        time.sleep(1)
+            
+    #-------------------------------------------
+    # Character consumes a potion from inventory
+    #-------------------------------------------
     def consume_potion(self, potion):
         amount_rest = potion.amount_rest
         
@@ -155,9 +180,11 @@ class Character(Entity):
                 
             self.stamina = rest_stamina
         
-
+    #------------------------
+    # Shows character's stats
+    #------------------------
     def show_character_stats(self):
-        print("----------------------------------------\n"
+        print("\n----------------------------------------\n"
              f"Name: {self._name}\n"
              f"Class: {self._character_class}\n"
              f"Level: {self.level}\n"
@@ -177,8 +204,10 @@ class Character(Entity):
              f"Dodge = {self.dodge}\n"
              f"Luck = {self._luck}\n"
               "----------------------------------------")
-        
-        
+            
+    #--------------------------------------------
+    # Level UP -> Increases the character's stats
+    #--------------------------------------------
     def level_up(self):
         self.level = self.level + 1
         self.strength = self.strength + 1
@@ -203,7 +232,9 @@ class Character(Entity):
         
         self.hp = math.ceil((50 + (50 * self.level * incr_percent_class[0])))
     
-        
+    #--------------------------------------------------------------------
+    # Gets the character's main resource to use abilities (MP or stamina)
+    #--------------------------------------------------------------------
     def get_main_resource(self):
         if self._character_class == "Archer": main_res = self.stamina
         elif self._character_class == "Mage": main_res = self.mp
@@ -212,21 +243,10 @@ class Character(Entity):
         
         return main_res
     
-    def cast_ability(self, cost):
-        if self._character_class == "Archer": self.stamina -= cost
-        elif self._character_class == "Mage": self.mp -= cost
-        elif self._character_class == "Rogue": self.stamina -= cost
-        elif self._character_class == "Warrior": self.stamina -= cost
+    def get_class_main_resource(self):
+        if self._character_class == "Archer": class_main_res = "Stamina"
+        elif self._character_class == "Mage": class_main_res = "MP"
+        elif self._character_class == "Rogue": class_main_res = "Stamina"
+        elif self._character_class == "Warrior": class_main_res = "Stamina"
         
-        
-    def set_new_abilities(self, new_abilities):
-        self._abilities = new_abilities
-
-    
-
-
-
-    
-
-    
-
+        return class_main_res

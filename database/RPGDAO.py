@@ -11,6 +11,9 @@ from components.abilities.CharacterAbility import CharacterAbility
 from components.abilities.MonsterAbility import MonsterAbility
 
 class RPGDAO:
+    #-----------------------------------------------------
+    # Saves (modifies) character's stats into the database
+    #-----------------------------------------------------
     @staticmethod
     def auto_save_game(character: Character):
         with PoolCursor() as cursor:
@@ -22,6 +25,9 @@ class RPGDAO:
 
             cursor.execute(update_query, values)
             
+    #-------------------------------------------
+    # Character consumes a potion from inventory
+    #-------------------------------------------
     @staticmethod
     def use_potion(character_name, potion: Potion, rest):
             with PoolCursor() as cursor:
@@ -29,7 +35,9 @@ class RPGDAO:
                 
                 print(f"You drink '{potion.name}' and restores +{rest} {potion.stat_rest}")
 
-    
+    #-------------------------
+    # Gets character's potions 
+    #-------------------------
     @classmethod
     def get_potions(cls, character: Character):
         with PoolCursor() as cursor:
@@ -61,7 +69,9 @@ class RPGDAO:
 
         return potions
 
-
+    #---------------------------------
+    # Compares stats between two items
+    #---------------------------------
     @staticmethod
     def items_comparation(character: Character, item):
         with PoolCursor() as cursor:
@@ -119,16 +129,19 @@ class RPGDAO:
                     attack_var = "+" + str(item.attack)
                     critical_var = "+" + str(item.critical_hit)
                     
-                    print("----------------------------------------\n"
-                        f"{item.name} stats\n"
-                        "----------------------------------------\n"
-                        f"Class: {item.weapon_class}\n"
-                        f"Attack: {item.attack} ({attack_var})\n"
-                        f"Critical Hit: {item.critical_hit} ({critical_var})\n"
-                        "----------------------------------------")
+                print("----------------------------------------\n"
+                    f"{item.name} stats\n"
+                    "----------------------------------------\n"
+                    f"Class: {item.weapon_class}\n"
+                    f"Attack: {item.attack} ({attack_var})\n"
+                    f"Critical Hit: {item.critical_hit} ({critical_var})\n"
+                    "----------------------------------------")
                     
             return item_equipped_post
 
+    #------------------------------------------
+    # Character equips an item (gear or weapon)
+    #------------------------------------------
     @staticmethod
     def equip_item(character: Character, item, item_equipped):
             with PoolCursor() as cursor:
@@ -155,7 +168,10 @@ class RPGDAO:
                     character.critical_hit += item.critical_hit
 
                 print(f"{item.name} equipped!")
-        
+
+    #-------------------------------------------------
+    # Stores a found item in the character's inventory
+    #-------------------------------------------------
     @staticmethod
     def save_item_in_inventory(character: Character, item):
             with PoolCursor() as cursor:
@@ -173,7 +189,9 @@ class RPGDAO:
 
                 cursor.execute(insert_query, values)
 
-
+    #-------------------------
+    # Gets monster's abilities
+    #-------------------------
     @classmethod
     def get_monster_abilities(cls, monster_type):
         with PoolCursor() as cursor:
@@ -192,7 +210,9 @@ class RPGDAO:
                     
         return abilities
     
-
+    #---------------------------
+    # Gets character's abilities
+    #---------------------------
     @classmethod
     def get_character_abilities(cls, character_class, level = 1):
         with PoolCursor() as cursor:
@@ -211,7 +231,9 @@ class RPGDAO:
             
         return abilities
     
-    
+    #----------------------------
+    # Opens character's inventory
+    #----------------------------
     @staticmethod
     def open_inventory(character_name):
         with PoolCursor() as cursor:
@@ -263,7 +285,9 @@ class RPGDAO:
 
             print("------------------------")
 
-
+    #---------------------------------------------
+    # Checks whether the character can use an item
+    #---------------------------------------------
     @staticmethod
     def check_inventory_item(item_name, item_type, character_name):
         with PoolCursor() as cursor:
@@ -283,7 +307,9 @@ class RPGDAO:
         
         return True if item else False
 
-
+    #-------------------------------------
+    # Gets a random item from a loot chest
+    #-------------------------------------
     @classmethod
     def get_items(cls, floor_level):
         with PoolCursor() as cursor:
@@ -323,7 +349,9 @@ class RPGDAO:
 
         return items
     
-
+    #--------------------
+    # Gets floor name
+    #--------------------
     @staticmethod
     def get_floor_name(floor_level):
         with PoolCursor() as cursor:
@@ -332,7 +360,9 @@ class RPGDAO:
         
         return floor_name
     
-    
+    #-----------------------
+    # Gets floor description
+    #-----------------------
     @staticmethod
     def get_floor_description(floor_level):
         with PoolCursor() as cursor:
@@ -341,14 +371,18 @@ class RPGDAO:
         
         return floor_description
     
-    
+    #--------------------
+    # Deletes a character
+    #--------------------
     @staticmethod
     def delete_game(character_name):
             with PoolCursor() as cursor:
                 cursor.execute("DELETE FROM characters WHERE name = %s", (character_name,))
                 print("Game deleted.");
 
-
+    #------------------------------
+    # Gets all the saved characters 
+    #------------------------------
     @classmethod
     def get_characters(cls):
         with PoolCursor() as cursor:
@@ -369,6 +403,9 @@ class RPGDAO:
         return characters
     
     
+    #----------------------------------------------
+    # Gets character's stats depending on its class
+    #----------------------------------------------
     @classmethod
     def get_class_stats(cls, character_class):
         with PoolCursor() as cursor:
@@ -380,7 +417,9 @@ class RPGDAO:
 
         return cls.data_to_dict(class_stats, class_data)[0]
     
-    
+    #------------------------
+    # Creates a new character
+    #------------------------
     @classmethod
     def create_new_character(cls, character_class):
         with PoolCursor() as cursor:
@@ -398,7 +437,9 @@ class RPGDAO:
             
         return character
 
-
+    #-----------------------------------------------------
+    # Gets monsters with the same level as the floor level
+    #-----------------------------------------------------
     @classmethod
     def get_level_monsters(cls, level):
         monster_stats = [('monster_type',), ('level',), ('hp',), ('mp',), ('stamina',), ('strength',), ('agility',), 
@@ -418,7 +459,9 @@ class RPGDAO:
         
         return monsters
     
-
+    #--------------------------------
+    # Saves character in the database
+    #--------------------------------
     @staticmethod
     def save_character(character: Character):
             with PoolCursor() as cursor:
@@ -431,7 +474,9 @@ class RPGDAO:
 
                 cursor.execute(insert_query, values)
 
-          
+    #-------------------------------------------------------
+    # Checks if there's another character with the same name
+    #-------------------------------------------------------   
     @staticmethod        
     def check_new_character_name(name):
         with PoolCursor() as cursor:
@@ -440,7 +485,9 @@ class RPGDAO:
         
         return True if name_exists else False
     
-    
+    #---------------------------------------------------------------------
+    # Transforms the raw data obtained from the database into a dictionary
+    #---------------------------------------------------------------------
     @classmethod
     def data_to_dict(cls, stats, data_tuples):
         data_array = []

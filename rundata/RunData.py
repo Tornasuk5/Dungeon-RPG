@@ -47,14 +47,13 @@ class RunData:
     @character.setter
     def character(self, character):
         self._character = character
-    
-# -------------------------------------------------------------- #
-#                        -> Methods <-                           #
-# -------------------------------------------------------------- #
-    
+        
+    # --------------------------
+    # Sets events' probabilities
+    # --------------------------
     def set_probabilities(self):
-        prob_loot = int(10 + self._character.luck) # Loot encounter probability
-        prob_rest_place = int(10 + self._character.luck) # Rest place encounter probability
+        prob_loot = int(20 + self._character.luck) # Loot encounter probability
+        prob_rest_place = int(20 + self._character.luck) # Rest place encounter probability
         prob_carry_on = int(100 - (self.PROB_BATTLE + prob_loot + prob_rest_place)) # No event probability
         
         for i in range(1, self.PROB_BATTLE): self._prob_list.append("battle")
@@ -62,15 +61,23 @@ class RunData:
         for i in range(1, prob_rest_place): self._prob_list.append("rest")
         for i in range(1, prob_carry_on): self._prob_list.append("")
     
-    
+    # ---------------------------------------------
+    # Picks a monster from the floor_monsters array
+    # ---------------------------------------------
     def get_monster(self):
         return self._floor_monsters.pop()
     
+    # ----------------------
+    # Sets a new floor level
+    # ----------------------
     def new_floor_level(self):
         self.__level += 1
         self._floor = Floor(self._db_manager.rpgdao.get_floor_name(self.__level), 
                             self._db_manager.rpgdao.get_floor_description(self.__level), self.__level)
         
+    # -----------------------------------------------------------
+    # Gets random monsters with the same level as the floor level
+    # -----------------------------------------------------------
     def set_random_monsters(self):
         monsters = self._db_manager.rpgdao.get_level_monsters(self.__level)
 

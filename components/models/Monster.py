@@ -11,7 +11,7 @@ class Monster(Entity):
                          data['attack'], data['defense'], data['critical_hit'], data['dodge'])
         
         self._monster_type = data['monster_type']
-            
+        
         self._abilities = abilities
 
     @property
@@ -22,10 +22,13 @@ class Monster(Entity):
     def abilities(self):
         return self._abilities
 
+    #----------------
+    # Monster attacks
+    #----------------
     def monster_attack(self, character):
         dodge_random = random.randint(0, 100)
         
-        if dodge_random <= character.dodge: print("You DODGE enemy's attack!")
+        if dodge_random <= character.dodge: print("\nYou DODGE enemy's attack!")
         
         else:
             damage = self.attack - character.defense
@@ -35,21 +38,25 @@ class Monster(Entity):
                 
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
-                    print("CRITICAL DAMAGE!")
+                    print("\nCRITICAL DAMAGE!")
                     
                 character.hp = character.hp - damage
                 
             else: damage = 0
 
-            print(f"{self._monster_type} deals {str(damage)} damage to {character.name}")
+            print(f"\n{self._monster_type} deals {str(damage)} damage to {character.name}")
+        
+        time.sleep(1)
             
-            
+    #------------------------
+    # Monster uses an ability
+    #------------------------
     def monster_ability(self, ability, character):
         self.cast_ability(ability.resources_cost)
         
         dodge_random = random.randint(0, 100)
         
-        if dodge_random <= character.dodge: print("You DODGE enemy's attack!")
+        if dodge_random <= character.dodge: print("\nYou DODGE enemy's attack!")
         
         else:
             damage = ability.attack_power - character.defense
@@ -59,13 +66,17 @@ class Monster(Entity):
                 
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
-                    print("CRITICAL DAMAGE!")
+                    print("\nCRITICAL DAMAGE!")
                     
                 character.hp = character.hp - damage
 
-            print(f"{self._monster_type} use '{ability.name}' and deals {damage} damage to {character.name}")
+            print(f"\n{self._monster_type} use '{ability.name}' and deals {damage} damage to {character.name}")
             
-        
+        time.sleep(1)
+            
+    #------------------------
+    # Shows monster's stats
+    #------------------------    
     def show_monster_stats(self):
         print("----------------------------------------\n"
              f"Monster: {self._monster_type}\n"
@@ -86,6 +97,9 @@ class Monster(Entity):
              f"Dodge = {self.dodge}\n"
               "----------------------------------------") 
         
+    #--------------------------------------------------------------
+    # Gets monster's main resource to use abilities (MP or stamina)
+    #--------------------------------------------------------------  
     def get_main_resource(self):
         if self._monster_type == "Undead": main_res = self.stamina
         elif self._monster_type == "Goblin": main_res = self.stamina
@@ -110,6 +124,9 @@ class Monster(Entity):
         
         return main_res
     
+    #------------------------------------------------------------
+    # Reduces the monster's main resource when casting an ability
+    #------------------------------------------------------------
     def cast_ability(self, cost):
         if self._monster_type == "Undead": self.stamina -= cost
         elif self._monster_type == "Goblin": self.stamina -= cost
