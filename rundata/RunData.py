@@ -6,9 +6,9 @@ from database.DBManager import DBManager
 
 class RunData:
     def __init__(self):
-        self.PROB_BATTLE = 30 # Enemy encounter
+        self.PROB_BATTLE = 30 # Character fights a monster
         self.PROB_TRAP = 25 # Trap chest probability
-        self.PROB_MONSTER_ABILITY = 25 # Use of an enemy's ability probability
+        self.PROB_MONSTER_ABILITY = 25 # Use of an monster's ability probability
         
         self._db_manager = DBManager()
         
@@ -52,8 +52,8 @@ class RunData:
     # Sets events' probabilities
     # --------------------------
     def set_probabilities(self):
-        prob_loot = int(20 + self._character.luck) # Loot encounter probability
-        prob_rest_place = int(20 + self._character.luck) # Rest place encounter probability
+        prob_loot = int(10 + self._character.luck) # Loot encounter probability
+        prob_rest_place = int(10 + self._character.luck) # Rest place encounter probability
         prob_carry_on = int(100 - (self.PROB_BATTLE + prob_loot + prob_rest_place)) # No event probability
         
         for i in range(1, self.PROB_BATTLE): self._prob_list.append("battle")

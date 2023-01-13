@@ -7,11 +7,20 @@ from components.items.Weapon import Weapon
 from components.models.Monster import Monster
 from utils.GameMethods import print_game_delay, exit_game, check_option
 
-
-def start_game(floor): 
-    print_game_delay("Starting game...")
-    print_game_delay(f"Level {floor.level} - {floor.name}")
-    
+#------------------
+# Prints event text
+#------------------
+def print_event(*texts):
+    for text in texts:
+        if len(text) > 50:
+            text_lines = text.split(". ")
+            for text_line in text_lines:
+                print(f"{text_line}.")
+                time.sleep(1)
+            time.sleep(1)
+        else:
+            print_game_delay(text)
+            
 #----------------------
 # Shows the battle flow
 #----------------------
@@ -39,10 +48,12 @@ def battle(run_data, monster):
                         monster.monster_ability(ability, character)
                     else: 
                         monster.monster_attack(character)
-                    
-            else: monster.monster_attack(character)
+
+            else: 
+                monster.monster_attack(character)
             
-        else: monster.monster_attack(character)
+        else: 
+            monster.monster_attack(character)
 
         if character.hp > 0:
             character_battle_menu(run_data, monster)           
@@ -164,6 +175,8 @@ def loot_encounter(run_data):
                     
     else: 
         print("\nYou decide not to open the chest, it could be a trap...")
+        
+    time.sleep(1)
     
 
 # -----------------------------------------------------
@@ -208,6 +221,8 @@ def rest(character):
             
             print(f"\nAfter rest, you have recover +{amount_hp_rest} HP and +{amount_stamina_rest} Stamina")
             
+    time.sleep(1)
+            
 # -------------------------------------------------------------------------
 # Prints the 'interface' of the character's options when fighting a monster
 # -------------------------------------------------------------------------
@@ -247,7 +262,7 @@ def character_battle_menu(run_data, monster):
             character_battle_menu(run_data, monster)
         
         elif character.get_main_resource() >= character_abilities[int(op) - 1].resources_cost: # Character have enough resources to cast the ability
-            character.character_ability(character_abilities[int(op) - 1], monster)         
+            character.character_ability(character_abilities[int(op) - 1], monster)      
         else:
             print_game_delay("Not enough resources")
             character_battle_menu(run_data, monster)

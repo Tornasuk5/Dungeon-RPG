@@ -452,10 +452,7 @@ class RPGDAO:
             
         monsters_data_dict = cls.data_to_dict(monster_stats, monsters_data)
         
-        monsters = []
-                 
-        for monster in monsters_data_dict:
-            monsters.append(Monster(monster, cls.get_monster_abilities(monster['monster_type'])))
+        monsters = [Monster(monster, cls.get_monster_abilities(monster['monster_type'])) for monster in monsters_data_dict]
         
         return monsters
     

@@ -39,6 +39,7 @@ class Monster(Entity):
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
                     print("\nCRITICAL DAMAGE!")
+                    time.sleep(1)
                     
                 character.hp = character.hp - damage
                 
@@ -67,6 +68,7 @@ class Monster(Entity):
                 if critical_hit_random <= self.critical_hit:
                     damage += round(damage * 0.5)
                     print("\nCRITICAL DAMAGE!")
+                    time.sleep(1)
                     
                 character.hp = character.hp - damage
 

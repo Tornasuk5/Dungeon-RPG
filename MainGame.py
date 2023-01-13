@@ -1,10 +1,9 @@
 import random
-import time
 import sys
 import os
 
 from menu.StartMenu import StartMenu
-from events.Events import start_game, battle, loot_encounter, rest
+from events.Events import print_event, battle, loot_encounter, rest
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -29,7 +28,7 @@ prob_list = run_data.prob_list
 #                      -> GAME STARTS <-                         #
 # -------------------------------------------------------------- #
 
-start_game(run_data.floor)
+print_event("Starting game...", f"Level {run_data.floor.level} - {run_data.floor.name}", run_data.floor.description)
 
 while run_data.floor.level < 10:  # FLoor levels control
 
@@ -49,7 +48,7 @@ while run_data.floor.level < 10:  # FLoor levels control
 
     # Carry on
     else:
-        print("\nGoing deeper into the dungeon...")
+        print_event("Going deeper into the dungeon...")
 
     # Level ends
     if not len(run_data.floor_monsters):
@@ -62,10 +61,7 @@ while run_data.floor.level < 10:  # FLoor levels control
         run_data.set_random_monsters()
         run_data.db_manager.rpgdao.auto_save_game(character)
         
-        print(f"\nLevel {run_data.floor.level} - {run_data.floor.name}")
-        time.sleep(1)
-        print(f"HP and {character.get_class_main_resource()} restored!")
-
-    time.sleep(1)
+        print_event(f"Level {run_data.floor.level} - {run_data.floor.name}", 
+                    run_data.floor.description, f"HP and {character.get_class_main_resource()} restored!")
 
 print("\nTHE END")
