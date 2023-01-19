@@ -68,7 +68,7 @@ class StartMenu:
     # -----------------------
     def create_character(self):
         print("\nChoose your class:\n"
-              "1. Archer\n"
+              "1. Hunter\n"
               "2. Mage\n"
               "3. Rogue\n"
               "4. Warrior")
@@ -76,7 +76,7 @@ class StartMenu:
         op = check_option(4, ['b'])
 
         if op == '1':
-            character = self._run_data.db_manager.rpgdao.create_new_character("Archer")
+            character = self._run_data.db_manager.rpgdao.create_new_character("Hunter")
         elif op == '2':
             character = self._run_data.db_manager.rpgdao.create_new_character("Mage")
         elif op == '3':
@@ -107,7 +107,6 @@ class StartMenu:
                 
                 self._main_character = character  # Save new character's name in order to get it in the main game script
                 self._run_data.character = character
-                self._run_data.set_probabilities()
             else:
                 self.load_menu()  # Return to the start menu
 
@@ -132,7 +131,6 @@ class StartMenu:
             character.abilities = self._run_data.db_manager.rpgdao.get_character_abilities(character.character_class, character.level)
             self._main_character = character
             self._run_data.character = character
-            self._run_data.set_probabilities()
 
     #--------------------
     # Deletes a character

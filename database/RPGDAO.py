@@ -12,7 +12,7 @@ from components.abilities.MonsterAbility import MonsterAbility
 
 class RPGDAO:
     #-----------------------------------------------------
-    # Saves (modifies) character's stats into the database
+    # Saves (modifies) character's stats into the databaseuse_po
     #-----------------------------------------------------
     @staticmethod
     def auto_save_game(character: Character):
@@ -29,11 +29,15 @@ class RPGDAO:
     # Character consumes a potion from inventory
     #-------------------------------------------
     @staticmethod
-    def use_potion(character_name, potion: Potion, rest):
+    def use_potion(character_name, potion_id):
             with PoolCursor() as cursor:
-                cursor.execute("DELETE FROM characters_potions WHERE ref_character = %s AND ref_potion = %s", (character_name, potion.id))
+                cursor.execute("SELECT id_cp FROM characters_potions " +
+                            "WHERE ref_character = %s AND ref_potion = %s " +
+                            "LIMIT 1", (character_name, potion_id))
+            
+                potion_id_cp = cursor.fetchone()
                 
-                print(f"You drink '{potion.name}' and restores +{rest} {potion.stat_rest}")
+                cursor.execute("DELETE FROM characters_potions WHERE id_cp = %s", potion_id_cp)
 
     #-------------------------
     # Gets character's potions 
@@ -153,8 +157,15 @@ class RPGDAO:
                         character.dodge -= item_equipped[2]
                         
                     cursor.execute("UPDATE characters_gear SET equipped = TRUE WHERE ref_character = %s AND ref_gear = %s", (character.name, item.id))
+                    
                     character.defense += item.defense
-                    character.dodge += item.dodge
+                    
+                    dodge_final = character.dodge + item.dodge
+                    
+                    if dodge_final > 100:
+                        character.dodge = 100
+                    else:
+                        character.dodge += item.dodge
                     
                 elif isinstance(item, Weapon):
                     
@@ -164,10 +175,17 @@ class RPGDAO:
                         character.critical_hit -= item_equipped[2]
                         
                     cursor.execute("UPDATE characters_weapons SET equipped = TRUE WHERE ref_character = %s AND ref_weapon = %s", (character.name, item.id))
+                    
                     character.attack += item.attack
-                    character.critical_hit += item.critical_hit
+                    
+                    critical_final = character.critical_hit + item.critical_hit
+                    
+                    if critical_final > 100:
+                        character.critical_hit = 100
+                    else:
+                        character.critical_hit += item.critical_hit
 
-                print(f"{item.name} equipped!")
+                print(f"\n{item.name} equipped!")
 
     #-------------------------------------------------
     # Stores a found item in the character's inventory
@@ -202,11 +220,7 @@ class RPGDAO:
             
             abilities_dicts = cls.data_to_dict(abilities_props, abilities_list)
             
-            abilities = []
-        
-        for ability in abilities_dicts:
-            ability = MonsterAbility(ability)
-            abilities.append(ability)
+            abilities = [MonsterAbility(ability) for ability in abilities_dicts]
                     
         return abilities
     
@@ -218,16 +232,12 @@ class RPGDAO:
         with PoolCursor() as cursor:
             abilities_props = [('id_ability',), ('name',), ('level',), ('attack_power',), ('resources_cost',)]
             
-            cursor.execute("SELECT id_ability, name, level, attack_power, resources_cost FROM classes_abilities WHERE ref_class = %s AND level <= %s", (character_class, level))
+            cursor.execute("SELECT id_ability, name, level, attack_power, resources_cost FROM classes_abilities WHERE ref_class = %s AND level <= %s ORDER BY level", (character_class, level))
             abilities_list = cursor.fetchall()
             
             abilities_dicts = cls.data_to_dict(abilities_props, abilities_list)
             
-            abilities = []
-        
-        for ability in abilities_dicts:
-            ability = CharacterAbility(ability)
-            abilities.append(ability)
+            abilities = [CharacterAbility(ability) for ability in abilities_dicts]
             
         return abilities
     
@@ -318,34 +328,34 @@ class RPGDAO:
             weapons_props = [('id_weapon',), ('name',), ('class',), ('level',), ('attack',), ('critical_hit',)]
             potions_props = [('id_potion',), ('name',), ('level',), ('stat_rest',), ('amount_rest',)]
         
-            cursor.execute("SELECT * FROM gear WHERE level <= %s", (floor_level,))
+            cursor.execute("SELECT * FROM gear WHERE level = %s", (floor_level,))
             gear_list = cursor.fetchall()
             
-            cursor.execute("SELECT * FROM weapons WHERE level <= %s", (floor_level,))
+            cursor.execute("SELECT * FROM weapons WHERE level = %s", (floor_level,))
             weapons_list = cursor.fetchall()
             
-            cursor.execute("SELECT * FROM potions WHERE level <= %s", (floor_level,))
+            cursor.execute("SELECT * FROM potions WHERE level = %s", (floor_level,))
             potions_list = cursor.fetchall()
             
             items = []
             
             if len(gear_list):
                 gear_items = cls.data_to_dict(gear_props, gear_list)
-                for i in range(0, len(gear_items)):
-                    gear_obj = Gear(gear_items[i])
-                    items.append(gear_obj)
+                
+                for gear in gear_items:
+                    items.append(Gear(gear))
                 
             if len(weapons_list):
                 weapon_items = cls.data_to_dict(weapons_props, weapons_list)
-                for i in range(0, len(weapon_items)):
-                    weapon_obj = Weapon(weapon_items[i])
-                    items.append(weapon_obj)
                 
+                for weapon in weapon_items:
+                    items.append(Weapon(weapon))
+                    
             if len(potions_list):
                 potion_items = cls.data_to_dict(potions_props, potions_list)
-                for i in range(0, len(potion_items)):
-                    potion_obj = Potion(potion_items[i])
-                    items.append(potion_obj)
+                
+                for potion in potion_items:
+                    items.append(Potion(potion))
 
         return items
     
@@ -455,6 +465,23 @@ class RPGDAO:
         monsters = [Monster(monster, cls.get_monster_abilities(monster['monster_type'])) for monster in monsters_data_dict]
         
         return monsters
+    
+    #--------------
+    # Gets THE BOSS
+    #--------------
+    @classmethod
+    def get_black_dragon(cls):
+        monster_stats = [('monster_type',), ('level',), ('hp',), ('mp',), ('stamina',), ('strength',), ('agility',), 
+                        ('intellect',), ('attack',), ('defense',), ('critical_hit',), ('dodge',)]
+        
+        with PoolCursor() as cursor:
+            
+            cursor.execute("SELECT * FROM monsters WHERE monster_type = 'Black Dragon'")
+            monster_data = cursor.fetchone()
+            
+        monsters_data_dict = cls.data_to_dict(monster_stats, monster_data)
+        
+        return Monster(monsters_data_dict[0], cls.get_monster_abilities(monsters_data_dict[0]['monster_type']))
     
     #--------------------------------
     # Saves character in the database

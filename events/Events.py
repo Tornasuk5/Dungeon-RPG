@@ -12,7 +12,7 @@ from utils.GameMethods import print_game_delay, exit_game, check_option
 #------------------
 def print_event(*texts):
     for text in texts:
-        if len(text) > 50:
+        if len(text) > 70:
             text_lines = text.split(". ")
             for text_line in text_lines:
                 print(f"{text_line}.")
@@ -31,28 +31,15 @@ def battle(run_data, monster):
 
     while monster.hp > 0 and character.hp > 0:
         if monster.monster_type != "Mimic":
-            prob_monster_ability_random = random.randint(1, 100)
+            event_monster = run_data.get_random_choice("monster")
             
-            if prob_monster_ability_random <= run_data.PROB_MONSTER_ABILITY:
-                monster_abilities = monster.abilities
-                
-                if len(monster_abilities):
-                    prob_ability = random.randint(1, 100)
-
-                    if prob_ability <= monster_abilities[1].probability: 
-                        ability = monster_abilities[1]
-                    else: 
-                        ability = monster_abilities[0]
-                    
-                    if monster.get_main_resource() >= ability.resources_cost: 
-                        monster.monster_ability(ability, character)
-                    else: 
-                        monster.monster_attack(character)
-
-            else: 
+            if event_monster == "ability":
+                ability = monster.get_random_ability()
+                if monster.get_main_resource("monster") >= ability.resources_cost: 
+                    monster.monster_ability(ability, character)
+            else:
                 monster.monster_attack(character)
-            
-        else: 
+        else:
             monster.monster_attack(character)
 
         if character.hp > 0:
@@ -78,16 +65,18 @@ def loot_encounter(run_data):
     
     if op.lower() == 'y':
         
-        if random.randint(1, 100) <= run_data.PROB_TRAP:
+        event_loot = run_data.get_random_choice("loot")
+        
+        if event_loot == "trap":
             
             print_game_delay("The chest is a TRAP!")
             
-            trap_list = ["poison", "mimic", "explosion"]
-            random_trap = random.choice(trap_list)
+            trap_events = ["poison", "mimic", "explosion"]
+            random_trap = random.choice(trap_events)
 
             if random_trap == "poison":
-                damage = int(character.get_full_hp() * 0.1)
-                character.hp = character.hp - damage
+                damage = round(character.get_full_hp() * 0.1)
+                character.hp -= damage
                 print_game_delay(f"You have been poisoned! -> You receive {damage} damage")
                 
             elif random_trap == "mimic":
@@ -95,7 +84,7 @@ def loot_encounter(run_data):
                 mimic = Monster({
                                 "monster_type": "Mimic",
                                 "level": level,
-                                "hp": (4 * level) + math.ceil((4 * level) * level * 0.3),
+                                "hp": (3 * level) + math.ceil((3 * level) * level * 0.3),
                                 "mp": 0,
                                 "stamina": 0,
                                 "strength": level,
@@ -109,8 +98,8 @@ def loot_encounter(run_data):
                 battle(run_data, mimic)
 
             elif random_trap == "explosion":
-                damage = int(character.get_full_hp() * 0.25)
-                character.hp = character.hp - damage
+                damage = round(character.get_full_hp() * 0.25)
+                character.hp -= damage
                 print_game_delay(f"The chest has exploted! -> You receive {damage} damage")
                 
             # Character's life's under 0 HP (DEAD)
@@ -121,54 +110,55 @@ def loot_encounter(run_data):
                 
         else:
             items = run_data.db_manager.rpgdao.get_items(run_data.floor.level)
-            item = random.choice(items) # Picks a random item
+        
+            chest_item = random.choice(items)
             
             print_game_delay("You open the chest and...")
             
-            print(f"You get '{item.name}'!")
+            print(f"You get '{chest_item.name}'!")
             time.sleep(1)
 
             # Item type -> Gear
-            if isinstance(item, Gear):
+            if isinstance(chest_item, Gear):
                 
-                if item.gear_class == character.character_class: # Checks gear's compatibility
+                if chest_item.gear_class == character.character_class: # Checks gear's compatibility
                     
-                    if run_data.db_manager.rpgdao.check_inventory_item(item.name, "gear", character.name): # Checks whether the gear is in inventory or not
+                    if run_data.db_manager.rpgdao.check_inventory_item(chest_item.name, "gear", character.name): # Checks whether the gear is in inventory or not
                         print("...but you already have this item.")
                     else:
-                        run_data.db_manager.rpgdao.save_item_in_inventory(character, item)
-                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, item) # Gear comparation between the getted and the equipped one
+                        run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
+                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, chest_item) # Gear comparation between the getted and the equipped one
                         
                         op = input("Do you want to equip it? (Y / N) -> ")
                         
-                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, item, item_equipped) # Equips gear
+                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, chest_item, item_equipped) # Equips gear
                             
                 else: 
                     print("...but you can't use this item")
                 
             # Item type -> Weapon
-            elif isinstance(item, Weapon):  # Item type -> Gear
+            elif isinstance(chest_item, Weapon):  # Item type -> Gear
                 
-                if item.weapon_class == character.character_class: # Checks weapon's compatibility
+                if chest_item.weapon_class == character.character_class: # Checks weapon's compatibility
                     
-                    if run_data.db_manager.rpgdao.check_inventory_item(item.name, "weapon", character.name): # Checks whether the weapon is in inventory or not
+                    if run_data.db_manager.rpgdao.check_inventory_item(chest_item.name, "weapon", character.name): # Checks whether the weapon is in inventory or not
                         print("...but you already have this item.")
                     else:
-                        run_data.db_manager.rpgdao.save_item_in_inventory(character, item)
-                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, item) # Weapon comparation between the getted and the equipped one
+                        run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
+                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, chest_item) # Weapon comparation between the getted and the equipped one
                         
                         op = input("Do you want to equip it? (Y / N) -> ")
                         
-                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, item, item_equipped) # Equips weapon
+                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, chest_item, item_equipped) # Equips weapon
                             
                 else: 
                     print("...but you can't use this item")
 
             # Item type -> Potion
-            elif isinstance(item, Potion):
+            elif isinstance(chest_item, Potion):
                 
-                if item.stat_rest == "HP" or (item.stat_rest == "MP" and character.character_class == "Mage") or (item.stat_rest == "Stamina" and character.character_class != "Mage"):
-                    run_data.db_manager.rpgdao.save_item_in_inventory(character, item)
+                if chest_item.stat_rest == "HP" or (chest_item.stat_rest == "MP" and character.character_class == "Mage") or (chest_item.stat_rest == "Stamina" and character.character_class != "Mage"):
+                    run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
                     
                 else: 
                     print("...but you can't use this item")
@@ -183,7 +173,7 @@ def loot_encounter(run_data):
 # Recovers HP, MP and Stamina (+ random stats benefits)
 # -----------------------------------------------------
 def rest(character):
-    print("\nYou've found a place that looks safe")
+    print("\nYou have found a place that looks safe")
     op = input("You want to rest a bit before continue? (Y / N) -> ")
     
     if op.lower() == "y":
@@ -228,13 +218,13 @@ def rest(character):
 # -------------------------------------------------------------------------
 def character_battle_menu(run_data, monster):
     character = run_data.character
-    print("\n-------------------------------------------------\n"
-        f"{monster.monster_type} - HP = {monster.hp} | MP = {monster.mp} | Stamina = {monster.stamina}\n"
-        "-------------------------------------------------\n"
-        f"{character.name} - HP = {character.hp} | MP = {character.mp} | Stamina = {character.stamina}\n"
-        "-------------------------------------------------\n"
+    print("\n-------------------------------------------------------------------------------\n"
+        f"{monster.monster_type} - HP = {monster.hp} | MP = {monster.mp} | Stamina = {monster.stamina} | Attack = {monster.attack} | Defense = {monster.defense}\n"
+        "-------------------------------------------------------------------------------\n"
+        f"{character.name} - HP = {character.hp} | MP = {character.mp} | Stamina = {character.stamina} | Attack = {character.attack} | Defense = {character.defense}\n"
+        "-------------------------------------------------------------------------------\n"
         "Actions\n"
-        "-------------------------------------------------\n"
+        "-------------------------------------------------------------------------------\n"
         "1. Attack\n"
         "2. Use ability\n"
         "3. Use item")
@@ -248,20 +238,20 @@ def character_battle_menu(run_data, monster):
         character_abilities = character.abilities
         count = 0
         
-        print("------------------------------------------\n"
-            f"{character.name} abilities\n"
-            "------------------------------------------")
+        print("-----------------------------------------------\n"
+             f"{character.name} abilities\n"
+              "-----------------------------------------------")
         
         for ability in character_abilities:
             count += 1
-            print(f"{count}. {ability.name} - Power: {ability.attack_power} | MP: {ability.resources_cost}")
+            print(f"{count}. {ability.name} - Power: {math.ceil(ability.attack_power * character.ability_power)} | {character.get_class_main_resource()} cost: {ability.resources_cost - math.floor(ability.resources_cost * character.ability_save)}")
             
         op = check_option(count, ['b'])
         
         if op == 'b': 
             character_battle_menu(run_data, monster)
         
-        elif character.get_main_resource() >= character_abilities[int(op) - 1].resources_cost: # Character have enough resources to cast the ability
+        elif character.get_main_resource("character") >= (character_abilities[int(op) - 1].resources_cost - math.floor((character_abilities[int(op) - 1].resources_cost * character.ability_save))): # Character have enough resources to cast the ability
             character.character_ability(character_abilities[int(op) - 1], monster)      
         else:
             print_game_delay("Not enough resources")
@@ -278,7 +268,43 @@ def character_battle_menu(run_data, monster):
             else:
                 potion = potions[int(op) - 1]
                 character.consume_potion(potion)
-                run_data.db_manager.rpgdao.use_potion(character.name, potion, potion.amount_rest)
+                run_data.db_manager.rpgdao.use_potion(character.name, potion.id)
         else:
             print_game_delay("No items available.")
             character_battle_menu(run_data, monster)
+            
+# ------------------------------------------
+# Levels a character's stat up when leveling
+# ------------------------------------------ 
+def level_character_stats(character):
+    stat_options = 2
+    if character.strength == 10:
+        print(f"\nYou can improve one stat:\n"
+                "1. Agility   | + Critical damage / + Dodge\n"
+                "2. Intellect | + Abilities damage / - Abilities cost")
+    elif character.agility == 10:
+        print(f"\nYou can improve one stat:\n"
+                "1. Strength  | + Attack / + Defense\n"
+                "2. Intellect | + Abilities damage / - Abilities cost")
+    elif character.intellect == 10:
+        print(f"\nYou can improve one stat:\n"
+                "1. Strength  | + Attack / + Defense\n"
+                "2. Agility   | + Critical damage / + Dodge\n")
+    else:
+        print(f"\nYou can improve one stat:\n"
+                "1. Strength  | + Attack / + Defense\n"
+                "2. Agility   | + Critical damage / + Dodge\n"
+                "3. Intellect | + Abilities damage / - Abilities cost")
+        stat_options = 3
+        
+    op = check_option(stat_options)
+    
+    if op == '1':
+        character.stats_up("Strength")
+        print_game_delay("Strength improved +1!")
+    elif op == '2':
+        character.stats_up("Agility")
+        print_game_delay("Agility improved +1!")
+    elif op == '3':
+        character.stats_up("Intellect")
+        print_game_delay("Intellect improved +1!")

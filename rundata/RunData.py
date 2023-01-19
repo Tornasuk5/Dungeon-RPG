@@ -6,16 +6,15 @@ from database.DBManager import DBManager
 
 class RunData:
     def __init__(self):
-        self.PROB_BATTLE = 30 # Character fights a monster
-        self.PROB_TRAP = 25 # Trap chest probability
-        self.PROB_MONSTER_ABILITY = 25 # Use of an monster's ability probability
+        self.__PROB_BATTLE = 15 # Character fights a monster
+        self.__PROB_TRAP = 25 # Trap chest probability
+        self.__PROB_MONSTER_ABILITY = 10 # Use of an monster's ability probability
         
         self._db_manager = DBManager()
         
         self._character = Character(dict.fromkeys(("hp", "mp", "stamina", "strength", "agility", 
                                                   "intellect", "attack", "defense", "critical_hit", "dodge", "name", 
                                                   "ref_class", "luck", "ref_floor_level")), [])
-        self._prob_list = []
         
         self.__level = 1
 
@@ -33,10 +32,6 @@ class RunData:
         return self._floor
     
     @property
-    def prob_list(self):
-        return self._prob_list
-    
-    @property
     def floor_monsters(self):
         return self._floor_monsters
     
@@ -48,18 +43,31 @@ class RunData:
     def character(self, character):
         self._character = character
         
-    # --------------------------
-    # Sets events' probabilities
-    # --------------------------
-    def set_probabilities(self):
-        prob_loot = int(10 + self._character.luck) # Loot encounter probability
-        prob_rest_place = int(10 + self._character.luck) # Rest place encounter probability
-        prob_carry_on = int(100 - (self.PROB_BATTLE + prob_loot + prob_rest_place)) # No event probability
+    # -------------------------
+    # Get events' random choice
+    # -------------------------
+    def get_random_choice(self, event):
+        choices = []
+        probabilities = []
         
-        for i in range(1, self.PROB_BATTLE): self._prob_list.append("battle")
-        for i in range(1, prob_loot): self._prob_list.append("loot")
-        for i in range(1, prob_rest_place): self._prob_list.append("rest")
-        for i in range(1, prob_carry_on): self._prob_list.append("")
+        if event == "main":
+            prob_loot = int(5 + self._character.luck) # Loot encounter probability
+            prob_rest_place = int(7 + self._character.luck) # Rest place encounter probability
+            prob_carry_on = int(100 - (self.__PROB_BATTLE + prob_loot + prob_rest_place)) # No event probability
+            
+            choices = ["battle", "loot", "rest", "carry_on"]
+            probabilities = [self.__PROB_BATTLE, prob_loot, prob_rest_place, prob_carry_on]
+            
+        elif event == "monster":
+            choices = ["ability", "attack"]
+            probabilities = [self.__PROB_MONSTER_ABILITY, 100 - self.__PROB_MONSTER_ABILITY]
+            
+        elif event == "loot":
+            choices = ["trap", "chest"]
+            trap_probability = self.__PROB_TRAP - self._character.luck
+            probabilities = [trap_probability, 100 - trap_probability]
+        
+        return random.choices(choices, probabilities)[0]
     
     # ---------------------------------------------
     # Picks a monster from the floor_monsters array
@@ -81,8 +89,7 @@ class RunData:
     def set_random_monsters(self):
         monsters = self._db_manager.rpgdao.get_level_monsters(self.__level)
 
-        for i in range(0, 5): 
+        for i in range(1): 
             monster = copy.deepcopy(random.choice(monsters))
             self._floor_monsters.append(monster)
-
         

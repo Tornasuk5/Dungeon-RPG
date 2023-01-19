@@ -19,7 +19,8 @@ class Character(Entity):
         self._luck = data['luck'] if 'luck' in data else random.randint(1, 10)
         self._floor_level = data['ref_floor_level'] if 'ref_floor_level' in data else 1
         self._abilities = abilities
-        
+        self._ability_power = 1.2 if self._character_class == "Mage" else 1.1
+        self._ability_save = 0.2 if self._character_class == "Mage" else 0.1
         
     @property
     def name(self):
@@ -41,6 +42,22 @@ class Character(Entity):
     def floor_level(self):
         return self._floor_level
     
+    @property
+    def ability_power(self):
+        return self._ability_power
+    
+    @ability_power.setter
+    def ability_power(self, ability_power):
+        self._ability_power = ability_power
+        
+    @property
+    def ability_save(self):
+        return self._ability_save
+    
+    @ability_save.setter
+    def ability_save(self, ability_save):
+        self._ability_save = ability_save
+    
     @name.setter
     def name(self, name):
         self._name = name
@@ -61,10 +78,10 @@ class Character(Entity):
     # Gets character's full HP
     #-------------------------
     def get_full_hp(self):
-        if self._character_class == "Archer": full_hp = math.ceil((50 + (50 * self.level * 0.5)))
-        elif self._character_class == "Mage": full_hp = math.ceil((50 + (50 * self.level * 0.25)))
-        elif self._character_class == "Rogue": full_hp = math.ceil((50 + (50 * self.level * 0.4)))
-        elif self._character_class == "Warrior": full_hp = math.ceil((50 + (50 * self.level * 0.6)))
+        if self._character_class == "Hunter": full_hp = math.ceil(50 * self.level * 0.75)
+        elif self._character_class == "Mage": full_hp = math.ceil(50 * self.level * 0.5)
+        elif self._character_class == "Rogue": full_hp = math.ceil(50 * self.level * 0.7)
+        elif self._character_class == "Warrior": full_hp = math.ceil(50 * self.level * 0.85)
 
         return full_hp
     
@@ -72,15 +89,16 @@ class Character(Entity):
     # Gets character's full MP
     #-------------------------
     def get_full_mp(self):
-        return math.ceil((25 + (25 * self.level * 0.75)))
+        return math.ceil(30 * self.level * 0.7)
     
     #------------------------------
     # Gets character's full stamina
     #------------------------------
     def get_full_stamina(self):
-        if self._character_class == "Archer": full_stamina = math.ceil((25 + (25 * self.level * 0.5)))
-        elif self._character_class == "Rogue": full_stamina = math.ceil((25 + (25 * self.level * 0.6)))
-        elif self._character_class == "Warrior": full_stamina = math.ceil((25 + (25 * self.level * 0.4)))
+        if self._character_class == "Hunter" or self._character_class == "Rogue":
+            full_stamina = math.ceil(30 * self.level * 0.55)
+        elif self._character_class == "Warrior": 
+            full_stamina = math.ceil(30 * self.level * 0.75)
 
         return full_stamina
     
@@ -88,23 +106,20 @@ class Character(Entity):
     # Character attacks
     #------------------
     def character_attack(self, monster):
-        dodge_random = random.randint(0, 100)
-        
-        if dodge_random <= monster.dodge: print(f"\n{monster.monster_type} DODGE your attack!")
+        if self.stat_probability(monster.dodge):
+            print(f"\n{monster.monster_type} DODGE your attack!")
         
         else:
             damage = self.attack - monster.defense
             
             if damage > 0:
-                
-                critical_hit_random = random.randint(0, 100)
-                
-                if critical_hit_random <= self.critical_hit:
+            
+                if self.stat_probability(self.critical_hit):
                     damage += round(damage * 0.5)
                     print("\nCRITICAL DAMAGE!")
                     time.sleep(1)
                     
-                monster.hp = monster.hp - damage
+                monster.hp -= damage
             
             else: damage = 0
             
@@ -116,29 +131,26 @@ class Character(Entity):
     # Character uses an ability
     #--------------------------
     def character_ability(self, ability, monster):
-        ability_cost = ability.resources_cost
-        if self._character_class == "Archer": self.stamina -= ability_cost
+        ability_cost = ability.resources_cost - math.floor((ability.resources_cost * self._ability_save))
+        
+        if self._character_class == "Hunter": self.stamina -= ability_cost
         elif self._character_class == "Mage": self.mp -= ability_cost
         elif self._character_class == "Rogue": self.stamina -= ability_cost
         elif self._character_class == "Warrior": self.stamina -= ability_cost
         
-        dodge_random = random.randint(0, 100)
-        
-        if dodge_random <= monster.dodge: print(f"\n{monster.monster_type} DODGE your attack!")
-        
+        if self.stat_probability(monster.dodge): 
+            print(f"\n{monster.monster_type} DODGE your attack!")
         else:
-            damage = ability.attack_power - monster.defense
+            damage = math.ceil((ability.attack_power * self._ability_power)) - monster.defense
             
             if damage > 0:
-                
-                critical_hit_random = random.randint(0, 100)
-                
-                if critical_hit_random <= self.critical_hit:
+
+                if self.stat_probability(self.critical_hit):
                     damage += round(damage * 0.5)
                     print("\nCRITICAL DAMAGE!")
                     time.sleep(1)
                 
-                monster.hp = monster.hp - damage
+                monster.hp -= damage
                 
             else: damage = 0
 
@@ -181,6 +193,8 @@ class Character(Entity):
                 rest_stamina = full_stamina
                 
             self.stamina = rest_stamina
+                
+        print(f"You drink '{potion.name}' and restores +{amount_rest} {potion.stat_rest}")
         
     #------------------------
     # Shows character's stats
@@ -190,65 +204,117 @@ class Character(Entity):
              f"Name: {self._name}\n"
              f"Class: {self._character_class}\n"
              f"Level: {self.level}\n"
-             f"Floor level: {self.floor_level}\n"
               "----------------------------------------\n"
              f"Stats\n"
              f"----------------------------------------\n"
-             f"HP = {self.hp}\n" 
-             f"MP = {self.mp}\n"
-             f"Stamina = {self.stamina}\n"
-             f"Strength = {self.strength}\n"
-             f"Agility = {self.agility}\n"
-             f"Intellect = {self.intellect}\n"
-             f"Attack = {self.attack}\n"
-             f"Defense = {self.defense}\n"
-             f"Critical hit = {self.critical_hit}\n"
-             f"Dodge = {self.dodge}\n"
-             f"Luck = {self._luck}\n"
+             f"HP = {self.hp}               | Health Points -> Character's life\n" 
+             f"MP = {self.mp}                | Mana Points -> Abilities' resource\n"
+             f"Stamina = {self.stamina}          | Abilities' resource\n"
+             f"Strength = {self.strength}          | + Attack / + Defense\n"
+             f"Agility = {self.agility}           | + Critical damage / + Dodge\n"
+             f"Intellect = {self.intellect}         | + Abilities damage / - Abilities cost\n"
+             f"Attack = {self.attack}            | + Damage inflicted (attack and abilities)\n"
+             f"Defense = {self.defense}           | - Damage from monsters\n"
+             f"Critical hit = {self.critical_hit}   | + Probability of causing critical damage\n"
+             f"Dodge = {self.dodge}          | + Probability of dodging a monster's attack\n"
+             f"Luck = {self._luck}              | + Probability of encountering loot chests and finding rest places\n"
               "----------------------------------------")
             
-    #--------------------------------------------
-    # Level UP -> Increases the character's stats
-    #--------------------------------------------
+    #--------------------------------------------------
+    # Level UP -> Increases the character's basic stats
+    #--------------------------------------------------
     def level_up(self):
-        self.level = self.level + 1
-        self.strength = self.strength + 1
-        self.agility = self.agility + 1
-        self.intellect = self.intellect + 1
+        self.level += 1
         
-        if self._character_class == "Archer": 
-            incr_percent_class = [0.5, 0.5]
-            self.stamina = math.ceil((25 + (25 * self.level * incr_percent_class[1])))
+        if self._character_class == "Hunter":
+            self.hp = math.ceil(50 * self.level * 0.75)
+            self.stamina = math.ceil(30 * self.level * 0.55)
 
         elif self._character_class == "Mage": 
-            incr_percent_class = [0.25, 0.75]
-            self.mp = math.ceil((25 + (25 * self.level * incr_percent_class[1])))
+            self.hp = math.ceil(50 * self.level * 0.5)
+            self.mp = math.ceil(30 * self.level * 0.7)
 
         elif self._character_class == "Rogue": 
-            incr_percent_class = [0.4, 0.6]
-            self.stamina = math.ceil((25 + (25 * self.level * incr_percent_class[1])))
+            self.hp = math.ceil(50 * self.level * 0.7)
+            self.stamina = math.ceil(30 * self.level * 0.55)
 
         elif self._character_class == "Warrior": 
-            incr_percent_class = [0.6, 0.4]
-            self.stamina = math.ceil((25 + (25 * self.level * incr_percent_class[1])))
+            self.hp = math.ceil(50 * self.level * 0.85)
+            self.stamina = math.ceil(30 * self.level * 0.75)
+            
         
-        self.hp = math.ceil((50 + (50 * self.level * incr_percent_class[0])))
-    
-    #--------------------------------------------------------------------
-    # Gets the character's main resource to use abilities (MP or stamina)
-    #--------------------------------------------------------------------
-    def get_main_resource(self):
-        if self._character_class == "Archer": main_res = self.stamina
-        elif self._character_class == "Mage": main_res = self.mp
-        elif self._character_class == "Rogue": main_res = self.stamina
-        elif self._character_class == "Warrior": main_res = self.stamina
-        
-        return main_res
-    
+    #-----------------------------------------------------------------------------------
+    # Level UP -> Increases one of the three main stats (strength, agility or intellect)
+    #-----------------------------------------------------------------------------------
+    def stats_up(self, stat):
+        if stat == "Strength":
+            self.strength += 1
+            if self._character_class == "Hunter": 
+                self.attack = math.ceil(self.attack + (self.strength * 0.2))
+                self.defense =  math.ceil(self.defense + (self.strength * 0.2))
+
+            elif self._character_class == "Mage": 
+                self.attack = math.ceil(self.attack + (self.strength * 0.1))
+                self.defense =  math.ceil(self.defense + (self.strength * 0.1))
+
+            elif self._character_class == "Rogue": 
+                self.attack = math.ceil(self.attack + (self.strength * 0.25))
+                self.defense =  math.ceil(self.defense + (self.strength * 0.15))
+
+            elif self._character_class == "Warrior": 
+                self.attack = math.ceil(self.attack + (self.strength * 0.3))
+                self.defense =  math.ceil(self.defense + (self.strength * 0.3))
+            
+        elif stat == "Agility":
+            self.agility += 1
+            if self._character_class == "Hunter": 
+                self.critical_hit = math.ceil(self.agility * 1 * 5)
+                self.dodge =  math.ceil(self.agility * 0.5 * 5)
+
+            elif self._character_class == "Mage": 
+                self.critical_hit = math.ceil(self.agility * 0.5 * 5)
+                self.dodge =  math.ceil(self.agility * 0.3 * 5)
+
+            elif self._character_class == "Rogue": 
+                self.critical_hit = math.ceil(self.agility * 2 * 5)
+                self.dodge =  math.ceil(self.agility * 1 * 5)
+
+            elif self._character_class == "Warrior": 
+                self.critical_hit = math.ceil(self.agility * 0.75 * 5)
+                self.dodge =  math.ceil(self.agility * 0.25 * 5)
+                
+        elif stat == "Intellect":
+            self.intellect += 1
+            if self._character_class == "Hunter" or self._character_class == "Rogue":
+                self._ability_power = self.ability_power + 0.05
+                self._ability_save = self._ability_save + 0.05
+
+            elif self._character_class == "Mage":
+                self._ability_power = self.ability_power + 0.075
+                self._ability_save = self._ability_save + 0.075
+
+            elif self._character_class == "Warrior":
+                self._ability_power = self.ability_power + 0.03
+                self._ability_save = self._ability_save + 0.03
+
+    #----------------------------------------------
+    # Gets character's class main resource (string)
+    #----------------------------------------------
     def get_class_main_resource(self):
-        if self._character_class == "Archer": class_main_res = "Stamina"
-        elif self._character_class == "Mage": class_main_res = "MP"
-        elif self._character_class == "Rogue": class_main_res = "Stamina"
-        elif self._character_class == "Warrior": class_main_res = "Stamina"
+        if self._character_class == "Hunter" or self._character_class == "Rogue" or self._character_class == "Warrior":
+            class_main_res = "Stamina"
+        elif self._character_class == "Mage": 
+            class_main_res = "MP"
         
         return class_main_res
+    
+    #-------------------------------------------------------------
+    # Recharges a bit the character's main resource after an event
+    #-------------------------------------------------------------
+    def auto_recharge_res(self):
+        if self._character_class == "Hunter" or self._character_class == "Rogue" or self._character_class == "Warrior":
+            if self.stamina < self.get_full_stamina():
+                self.stamina += 1
+        elif self._character_class == "Mage":
+            if self.mp < self.get_full_mp():
+                self.mp += 1
