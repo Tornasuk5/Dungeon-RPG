@@ -174,7 +174,7 @@ def loot_encounter(run_data):
 # -----------------------------------------------------
 def rest(character):
     print("\nYou have found a place that looks safe")
-    op = input("You want to rest a bit before continue? (Y / N) -> ")
+    op = input("You want to rest a bit before continuing? (Y / N) -> ")
     
     if op.lower() == "y":
         amount_hp_rest = int(character.get_full_hp() * 0.2)
@@ -197,7 +197,7 @@ def rest(character):
                 
             character.mp = rest_mp
             
-            print_game_delay(f"After rest, you have recover +{amount_hp_rest} HP and +{amount_mp_rest} MP")
+            print_game_delay(f"After resting, you recover +{amount_hp_rest} HP and +{amount_mp_rest} MP")
             
         else:
             amount_stamina_rest = int(character.get_full_stamina() * 0.5)
@@ -209,7 +209,7 @@ def rest(character):
                 
             character.stamina = rest_stamina
             
-            print(f"\nAfter rest, you have recover +{amount_hp_rest} HP and +{amount_stamina_rest} Stamina")
+            print(f"\nAfter resting, you recover +{amount_hp_rest} HP and +{amount_stamina_rest} Stamina")
             
     time.sleep(1)
             

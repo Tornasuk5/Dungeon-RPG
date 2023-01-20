@@ -81,7 +81,7 @@ class Character(Entity):
         if self._character_class == "Hunter": full_hp = math.ceil(50 * self.level * 0.75)
         elif self._character_class == "Mage": full_hp = math.ceil(50 * self.level * 0.5)
         elif self._character_class == "Rogue": full_hp = math.ceil(50 * self.level * 0.7)
-        elif self._character_class == "Warrior": full_hp = math.ceil(50 * self.level * 0.85)
+        elif self._character_class == "Warrior": full_hp = math.ceil(50 * self.level * 0.8)
 
         return full_hp
     
@@ -239,7 +239,7 @@ class Character(Entity):
             self.stamina = math.ceil(30 * self.level * 0.55)
 
         elif self._character_class == "Warrior": 
-            self.hp = math.ceil(50 * self.level * 0.85)
+            self.hp = math.ceil(50 * self.level * 0.8)
             self.stamina = math.ceil(30 * self.level * 0.75)
             
         

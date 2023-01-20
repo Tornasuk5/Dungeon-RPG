@@ -8,7 +8,7 @@ class RunData:
     def __init__(self):
         self.__PROB_BATTLE = 15 # Character fights a monster
         self.__PROB_TRAP = 25 # Trap chest probability
-        self.__PROB_MONSTER_ABILITY = 10 # Use of an monster's ability probability
+        self.__PROB_MONSTER_ABILITY = 20 # Use of an monster's ability probability
         
         self._db_manager = DBManager()
         
@@ -89,7 +89,7 @@ class RunData:
     def set_random_monsters(self):
         monsters = self._db_manager.rpgdao.get_level_monsters(self.__level)
 
-        for i in range(1): 
+        for i in range(5): 
             monster = copy.deepcopy(random.choice(monsters))
             self._floor_monsters.append(monster)
         
