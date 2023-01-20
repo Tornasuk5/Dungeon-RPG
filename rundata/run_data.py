@@ -1,8 +1,8 @@
 import copy
 import random
-from components.dungeon.Floor import Floor
-from components.models.Character import Character
-from database.DBManager import DBManager
+from components.dungeon.floor import Floor
+from components.models.character import Character
+from database.db_manager import DBManager
 
 class RunData:
     def __init__(self):

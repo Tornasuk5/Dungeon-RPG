@@ -1,11 +1,11 @@
 import math
 import time
 import random
-from components.items.Gear import Gear
-from components.items.Potion import Potion
-from components.items.Weapon import Weapon
-from components.models.Monster import Monster
-from utils.GameMethods import print_game_delay, exit_game, check_option
+from components.items.gear import Gear
+from components.items.potion import Potion
+from components.items.weapon import Weapon
+from components.models.monster import Monster
+from utils.game_methods import print_game_delay, exit_game, check_option
 
 #------------------
 # Prints event text

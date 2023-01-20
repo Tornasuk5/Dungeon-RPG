@@ -1,8 +1,8 @@
 import sys
 import os
 
-from menu.StartMenu import StartMenu
-from events.Events import print_event, battle, loot_encounter, rest, level_character_stats
+from menu.start_menu import StartMenu
+from events.events import print_event, battle, loot_encounter, rest, level_character_stats
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)

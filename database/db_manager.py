@@ -1,4 +1,4 @@
-from database.RPGDAO import RPGDAO
+from database.rpgdao import RPGDAO
 
 class DBManager:
     def __init__(self):

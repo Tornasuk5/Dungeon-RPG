@@ -1,14 +1,12 @@
-from numpy import *
+from database.pool_cursor import PoolCursor
 
-from database.PoolCursor import PoolCursor
-
-from components.items.Potion import Potion
-from components.items.Gear import Gear
-from components.items.Weapon import Weapon
-from components.models.Character import Character
-from components.models.Monster import Monster
-from components.abilities.CharacterAbility import CharacterAbility
-from components.abilities.MonsterAbility import MonsterAbility
+from components.items.potion import Potion
+from components.items.gear import Gear
+from components.items.weapon import Weapon
+from components.models.character import Character
+from components.models.monster import Monster
+from components.abilities.character_ability import CharacterAbility
+from components.abilities.monster_ability import MonsterAbility
 
 class RPGDAO:
     #-----------------------------------------------------

@@ -48,5 +48,7 @@ class RPGDatabase:
     @classmethod
     def close_con_pool(cls):
         cls.get_con_pool().closeall()
+        
+        
 
 

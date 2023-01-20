@@ -1,8 +1,8 @@
 import sys
 import os
 import time
-from rundata.RunData import RunData
-from utils.GameMethods import check_option, exit_game
+from rundata.run_data import RunData
+from utils.game_methods import check_option, exit_game
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)

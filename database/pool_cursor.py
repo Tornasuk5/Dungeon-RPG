@@ -1,4 +1,4 @@
-from database.RPGDatabase import RPGDatabase
+from database.rpg_database import RPGDatabase
 
 class PoolCursor:
     def __init__(self):

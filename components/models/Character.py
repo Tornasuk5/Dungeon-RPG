@@ -2,7 +2,7 @@ import time
 import math
 import random
 
-from components.models.Entity import Entity
+from components.models.entity import Entity
 
 class Character(Entity):
 
