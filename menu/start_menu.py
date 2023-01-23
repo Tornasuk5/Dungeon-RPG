@@ -1,18 +1,12 @@
-import sys
-import os
 import time
 from rundata.run_data import RunData
 from utils.game_methods import check_option, exit_game
-
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
 
 class StartMenu:
     def __init__(self):
         self._run_data = RunData()
         
-        self.__characters = self._run_data.db_manager.rpgdao.get_characters()
+        self.__characters = self._run_data.rpgdao.get_characters()
 
         self._main_character = ""
 
@@ -76,13 +70,13 @@ class StartMenu:
         op = check_option(4, ['b'])
 
         if op == '1':
-            character = self._run_data.db_manager.rpgdao.create_new_character("Hunter")
+            character = self._run_data.rpgdao.create_new_character("Hunter")
         elif op == '2':
-            character = self._run_data.db_manager.rpgdao.create_new_character("Mage")
+            character = self._run_data.rpgdao.create_new_character("Mage")
         elif op == '3':
-            character = self._run_data.db_manager.rpgdao.create_new_character("Rogue")
+            character = self._run_data.rpgdao.create_new_character("Rogue")
         elif op == '4':
-            character = self._run_data.db_manager.rpgdao.create_new_character("Warrior")
+            character = self._run_data.rpgdao.create_new_character("Warrior")
             
         if op == 'b':
             self.load_menu()
@@ -92,7 +86,7 @@ class StartMenu:
 
             while not check_name:
                 name = input("Character's name: ")
-                if self._run_data.db_manager.rpgdao.check_new_character_name(name):
+                if self._run_data.rpgdao.check_new_character_name(name):
                     print("Character's name already exist, try other")
                 else:
                     check_name = True
@@ -103,7 +97,7 @@ class StartMenu:
             start = input("Enter into The Dungeon? (Y / N) -> ")
 
             if start.lower() == 'y':
-                self._run_data.db_manager.rpgdao.save_character(character)  # Save new character in db
+                self._run_data.rpgdao.save_character(character)  # Save new character in db
                 
                 self._main_character = character  # Save new character's name in order to get it in the main game script
                 self._run_data.character = character
@@ -128,7 +122,7 @@ class StartMenu:
             self.load_menu()
         else:
             character = self.__characters[int(op) - 1]
-            character.abilities = self._run_data.db_manager.rpgdao.get_character_abilities(character.character_class, character.level)
+            character.abilities = self._run_data.rpgdao.get_character_abilities(character.character_class, character.level)
             self._main_character = character
             self._run_data.character = character
 
@@ -146,7 +140,7 @@ class StartMenu:
         if op == 'b':
             self.load_menu()
         else:
-            self._run_data.db_manager.rpgdao.delete_game(self.__characters.pop(int(op)-1).name)
+            self._run_data.rpgdao.delete_game(self.__characters.pop(int(op)-1).name)
             time.sleep(1)
 
             if len(self.__characters) >= 1:

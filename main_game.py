@@ -1,12 +1,16 @@
-import sys
-import os
+import os.path
 
 from menu.start_menu import StartMenu
 from events.events import print_event, battle, loot_encounter, rest, level_character_stats
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+# -------------------------------------------------------------- #
+#                       -> SQLITE DB INIT <-                    #
+# -------------------------------------------------------------- #
+
+if not os.path.isfile("sqlite/database/dungeon_rpg.db"):
+    import sqlite.init_database
+else:
+    pass
 
 # -------------------------------------------------------------- #
 #                       -> START MENU <-                         #
@@ -39,7 +43,10 @@ while run_data.floor.level < 10:  # FLoor levels control
 
     # Rest place event
     elif event == "rest":
-        rest(character)
+        if character.hp != character.get_full_hp() or (character.get_main_resource("character") != character.get_full_stamina() or character.get_main_resource("character") == character.get_full_mp()):
+            rest(character)
+        else:
+            print_event("Going deeper into the dungeon...")
 
     # Battle event
     elif event == "battle":
@@ -57,7 +64,7 @@ while run_data.floor.level < 10:  # FLoor levels control
         
         if (character.level < run_data.floor.level):
             character.level_up()
-            character.abilities = run_data.db_manager.rpgdao.get_character_abilities(character.character_class, run_data.floor.level)
+            character.abilities = run_data.rpgdao.get_character_abilities(character.character_class, run_data.floor.level)
             
             print_event(f"Level up! {character.level-1} -> {character.level}", 
                         f"HP and {character.get_class_main_resource()} restored!")
@@ -65,7 +72,7 @@ while run_data.floor.level < 10:  # FLoor levels control
             level_character_stats(character)
             
         run_data.set_random_monsters()
-        run_data.db_manager.rpgdao.auto_save_game(character)
+        run_data.rpgdao.auto_save_game(character)
         
         print_event("You have completed this level! Going to the next one...")
         
@@ -77,5 +84,5 @@ while run_data.floor.level < 10:  # FLoor levels control
         print("\n---------------------------------------------------------------")
 
 if run_data.floor.level == 10:
-    battle(run_data, run_data.db_manager.rpgdao.get_black_dragon())
+    battle(run_data, run_data.rpgdao.get_black_dragon())
     print_event(f"\n{character.name} HAS CONQUERED THE DUNGEON!")

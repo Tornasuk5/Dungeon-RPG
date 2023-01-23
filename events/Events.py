@@ -50,7 +50,7 @@ def battle(run_data, monster):
         del monster
     else:
         print_game_delay("You are dead.")
-        run_data.db_manager.rpgdao.delete_game(character.name)
+        run_data.rpgdao.delete_game(character.name)
         exit_game()
             
     
@@ -105,11 +105,11 @@ def loot_encounter(run_data):
             # Character's life's under 0 HP (DEAD)
             if character.hp <= 0:
                 print_game_delay("You are dead.")
-                run_data.db_manager.rpgdao.delete_game(character.name)
+                run_data.rpgdao.delete_game(character.name)
                 exit_game()
                 
         else:
-            items = run_data.db_manager.rpgdao.get_items(run_data.floor.level)
+            items = run_data.rpgdao.get_items(run_data.floor.level)
         
             chest_item = random.choice(items)
             
@@ -123,15 +123,15 @@ def loot_encounter(run_data):
                 
                 if chest_item.gear_class == character.character_class: # Checks gear's compatibility
                     
-                    if run_data.db_manager.rpgdao.check_inventory_item(chest_item.name, "gear", character.name): # Checks whether the gear is in inventory or not
+                    if run_data.rpgdao.check_inventory_item(chest_item.name, "gear", character.name): # Checks whether the gear is in inventory or not
                         print("...but you already have this item.")
                     else:
-                        run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
-                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, chest_item) # Gear comparation between the getted and the equipped one
+                        run_data.rpgdao.save_item_in_inventory(character, chest_item)
+                        item_equipped = run_data.rpgdao.items_comparation(character, chest_item) # Gear comparation between the getted and the equipped one
                         
                         op = input("Do you want to equip it? (Y / N) -> ")
                         
-                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, chest_item, item_equipped) # Equips gear
+                        if op.lower() == 'y': run_data.rpgdao.equip_item(character, chest_item, item_equipped) # Equips gear
                             
                 else: 
                     print("...but you can't use this item")
@@ -141,15 +141,15 @@ def loot_encounter(run_data):
                 
                 if chest_item.weapon_class == character.character_class: # Checks weapon's compatibility
                     
-                    if run_data.db_manager.rpgdao.check_inventory_item(chest_item.name, "weapon", character.name): # Checks whether the weapon is in inventory or not
+                    if run_data.rpgdao.check_inventory_item(chest_item.name, "weapon", character.name): # Checks whether the weapon is in inventory or not
                         print("...but you already have this item.")
                     else:
-                        run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
-                        item_equipped = run_data.db_manager.rpgdao.items_comparation(character, chest_item) # Weapon comparation between the getted and the equipped one
+                        run_data.rpgdao.save_item_in_inventory(character, chest_item)
+                        item_equipped = run_data.rpgdao.items_comparation(character, chest_item) # Weapon comparation between the getted and the equipped one
                         
                         op = input("Do you want to equip it? (Y / N) -> ")
                         
-                        if op.lower() == 'y': run_data.db_manager.rpgdao.equip_item(character, chest_item, item_equipped) # Equips weapon
+                        if op.lower() == 'y': run_data.rpgdao.equip_item(character, chest_item, item_equipped) # Equips weapon
                             
                 else: 
                     print("...but you can't use this item")
@@ -158,7 +158,7 @@ def loot_encounter(run_data):
             elif isinstance(chest_item, Potion):
                 
                 if chest_item.stat_rest == "HP" or (chest_item.stat_rest == "MP" and character.character_class == "Mage") or (chest_item.stat_rest == "Stamina" and character.character_class != "Mage"):
-                    run_data.db_manager.rpgdao.save_item_in_inventory(character, chest_item)
+                    run_data.rpgdao.save_item_in_inventory(character, chest_item)
                     
                 else: 
                     print("...but you can't use this item")
@@ -178,7 +178,7 @@ def rest(character):
     
     if op.lower() == "y":
         amount_hp_rest = int(character.get_full_hp() * 0.2)
-        rest_hp = character.hp + amount_hp_rest;
+        rest_hp = character.hp + amount_hp_rest
         
         if rest_hp > character.get_full_hp(): 
             amount_hp_rest = character.get_full_hp() - character.hp
@@ -189,7 +189,7 @@ def rest(character):
         if character.character_class == "Mage":
             
             amount_mp_rest = int(character.get_full_mp() * 0.5)
-            rest_mp = character.mp + amount_mp_rest;
+            rest_mp = character.mp + amount_mp_rest
             
             if rest_mp > character.get_full_mp(): 
                 amount_mp_rest = character.get_full_mp() - character.mp
@@ -201,7 +201,7 @@ def rest(character):
             
         else:
             amount_stamina_rest = int(character.get_full_stamina() * 0.5)
-            rest_stamina = character.stamina + amount_stamina_rest;
+            rest_stamina = character.stamina + amount_stamina_rest
             
             if rest_stamina > character.get_full_stamina(): 
                 amount_stamina_rest = character.get_full_stamina() - character.stamina
@@ -258,7 +258,7 @@ def character_battle_menu(run_data, monster):
             character_battle_menu(run_data, monster)
             
     elif op == '3':
-        potions = run_data.db_manager.rpgdao.get_potions(character)
+        potions = run_data.rpgdao.get_potions(character)
         
         if potions:
             op = check_option(len(potions), ['b'])
@@ -268,7 +268,7 @@ def character_battle_menu(run_data, monster):
             else:
                 potion = potions[int(op) - 1]
                 character.consume_potion(potion)
-                run_data.db_manager.rpgdao.use_potion(character.name, potion.id)
+                run_data.rpgdao.use_potion(character.name, potion.id)
         else:
             print_game_delay("No items available.")
             character_battle_menu(run_data, monster)
@@ -279,18 +279,22 @@ def character_battle_menu(run_data, monster):
 def level_character_stats(character):
     stat_options = 2
     if character.strength == 10:
+        stats = ["Agility", "Intellect"]
         print(f"\nYou can improve one stat:\n"
                 "1. Agility   | + Critical damage / + Dodge\n"
                 "2. Intellect | + Abilities damage / - Abilities cost")
     elif character.agility == 10:
+        stats = ["Strength", "Intellect"]
         print(f"\nYou can improve one stat:\n"
                 "1. Strength  | + Attack / + Defense\n"
                 "2. Intellect | + Abilities damage / - Abilities cost")
     elif character.intellect == 10:
+        stats = ["Strength", "Agility"]
         print(f"\nYou can improve one stat:\n"
                 "1. Strength  | + Attack / + Defense\n"
                 "2. Agility   | + Critical damage / + Dodge\n")
     else:
+        stats = ["Strength", "Agility", "Intellect"]
         print(f"\nYou can improve one stat:\n"
                 "1. Strength  | + Attack / + Defense\n"
                 "2. Agility   | + Critical damage / + Dodge\n"
@@ -300,11 +304,11 @@ def level_character_stats(character):
     op = check_option(stat_options)
     
     if op == '1':
-        character.stats_up("Strength")
-        print_game_delay("Strength improved +1!")
+        character.stats_up(stats[0])
+        print_game_delay(f"{stats[0]} improved +1!")
     elif op == '2':
-        character.stats_up("Agility")
-        print_game_delay("Agility improved +1!")
+        character.stats_up(stats[1])
+        print_game_delay(f"{stats[1]} improved +1!")
     elif op == '3':
-        character.stats_up("Intellect")
-        print_game_delay("Intellect improved +1!")
+        character.stats_up(stats[2])
+        print_game_delay(f"{stats[2]} improved +1!")

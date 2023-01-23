@@ -2,15 +2,15 @@ import copy
 import random
 from components.dungeon.floor import Floor
 from components.models.character import Character
-from database.db_manager import DBManager
+from sqlite.rpgdao import RpgDao
 
 class RunData:
     def __init__(self):
-        self.__PROB_BATTLE = 15 # Character fights a monster
+        self.__PROB_BATTLE = 17 # Character fights a monster
         self.__PROB_TRAP = 25 # Trap chest probability
         self.__PROB_MONSTER_ABILITY = 20 # Use of an monster's ability probability
         
-        self._db_manager = DBManager()
+        self._rpgdao = RpgDao()
         
         self._character = Character(dict.fromkeys(("hp", "mp", "stamina", "strength", "agility", 
                                                   "intellect", "attack", "defense", "critical_hit", "dodge", "name", 
@@ -18,14 +18,13 @@ class RunData:
         
         self.__level = 1
 
-        self._floor = Floor(self._db_manager.rpgdao.get_floor_name(self.__level), 
-                            self._db_manager.rpgdao.get_floor_description(self.__level))
+        self._floor = Floor(self._rpgdao.get_floor_name(self.__level), self._rpgdao.get_floor_description(self.__level))
         
         self._floor_monsters = []
         
     @property
-    def db_manager(self):
-        return self._db_manager
+    def rpgdao(self):
+        return self._rpgdao
     
     @property
     def floor(self):
@@ -52,7 +51,7 @@ class RunData:
         
         if event == "main":
             prob_loot = int(5 + self._character.luck) # Loot encounter probability
-            prob_rest_place = int(7 + self._character.luck) # Rest place encounter probability
+            prob_rest_place = int(5 + self._character.luck) # Rest place encounter probability
             prob_carry_on = int(100 - (self.__PROB_BATTLE + prob_loot + prob_rest_place)) # No event probability
             
             choices = ["battle", "loot", "rest", "carry_on"]
@@ -80,14 +79,14 @@ class RunData:
     # ----------------------
     def new_floor_level(self):
         self.__level += 1
-        self._floor = Floor(self._db_manager.rpgdao.get_floor_name(self.__level), 
-                            self._db_manager.rpgdao.get_floor_description(self.__level), self.__level)
+        self._floor = Floor(self._rpgdao.get_floor_name(self.__level), 
+                            self._rpgdao.get_floor_description(self.__level), self.__level)
         
     # -----------------------------------------------------------
     # Gets random monsters with the same level as the floor level
     # -----------------------------------------------------------
     def set_random_monsters(self):
-        monsters = self._db_manager.rpgdao.get_level_monsters(self.__level)
+        monsters = self._rpgdao.get_level_monsters(self.__level)
 
         for i in range(5): 
             monster = copy.deepcopy(random.choice(monsters))

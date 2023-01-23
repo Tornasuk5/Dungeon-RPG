@@ -45,7 +45,8 @@ def print_game_delay(text):
 @staticmethod
 def exit_game():
     sys.exit("Game closed.")
-    
+
+'''
 #--------------------------
 # Shows game's menu options
 #--------------------------
@@ -64,12 +65,13 @@ def show_menu(cls, run_data):
     if op == 1:
         pass
     if op == 2:
-        run_data.db_manager.rpgdao.open_inventory()
+        run_data.rpgdao.open_inventory()
     if op == 3:
         pass
         run_data.character.show_character_stats()
     if op == 4:
         sys.exit("")
-        import MainGame
+        import main_game
     if op == 5:
         cls.exit_game()
+'''
