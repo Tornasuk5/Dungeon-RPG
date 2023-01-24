@@ -6,7 +6,7 @@ from sqlite.rpgdao import RpgDao
 
 class RunData:
     def __init__(self):
-        self.__PROB_BATTLE = 17 # Character fights a monster
+        self.__PROB_BATTLE = 15 # Character fights a monster
         self.__PROB_TRAP = 25 # Trap chest probability
         self.__PROB_MONSTER_ABILITY = 20 # Use of an monster's ability probability
         

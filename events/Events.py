@@ -20,6 +20,8 @@ def print_event(*texts):
             time.sleep(1)
         else:
             print_game_delay(text)
+            if text == "Starting game...":
+                print("\n---------------------------------------------------------------")
             
 #----------------------
 # Shows the battle flow
@@ -35,10 +37,15 @@ def battle(run_data, monster):
             
             if event_monster == "ability":
                 ability = monster.get_random_ability()
-                if monster.get_main_resource("monster") >= ability.resources_cost: 
+                
+                if monster.get_main_resource("monster") >= ability.resources_cost:
                     monster.monster_ability(ability, character)
+                else:
+                    monster.monster_attack(character)
+                    
             else:
                 monster.monster_attack(character)
+                
         else:
             monster.monster_attack(character)
 
@@ -53,7 +60,6 @@ def battle(run_data, monster):
         run_data.rpgdao.delete_game(character.name)
         exit_game()
             
-    
 # -------------------------------------------------------------------
 # Shows an "encounter with a loot chest (or something else...)" event
 # -------------------------------------------------------------------

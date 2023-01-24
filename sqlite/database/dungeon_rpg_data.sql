@@ -139,7 +139,7 @@ CREATE TABLE characters_potions(
 INSERT INTO classes VALUES ('Hunter', 38, 0, 17, 1, 2, 1, 2, 1, 10, 5);
 INSERT INTO classes VALUES ('Mage', 25, 21, 0, 1, 1, 2, 1, 1, 2.5, 1.5);
 INSERT INTO classes VALUES ('Rogue', 35, 0, 17, 1, 2, 1, 3, 1, 20, 10);
-INSERT INTO classes VALUES ('Warrior', 43, 0, 23, 2, 1, 1, 2, 2, 3.75, 1.25);
+INSERT INTO classes VALUES ('Warrior', 40, 0, 23, 2, 1, 1, 2, 2, 3.75, 1.25);
 
 /* CLASSES_ABILITIES */
 /* Hunter */
@@ -149,11 +149,11 @@ INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_cla
 INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Arcane Shot', 4, 12, 7, 'Hunter');
 INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Fire Rain', 5, 17, 13, 'Hunter');
 
-INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Elemental Shot', 6, 27, 20, 'Hunter');
-INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Raptor Edge', 7, 40, 30, 'Hunter');
-INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Hurricane', 8, 54, 40, 'Hunter');
-INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Stellar Eagle', 9, 71, 53, 'Hunter');
-INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Thousand Arrows', 10, 90, 67, 'Hunter');
+INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Elemental Shot', 6, 27, 19, 'Hunter');
+INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Raptor Edge', 7, 40, 26, 'Hunter');
+INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Hurricane', 8, 54, 34, 'Hunter');
+INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Stellar Eagle', 9, 71, 42, 'Hunter');
+INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Thousand Arrows', 10, 90, 51, 'Hunter');
 
 /* Mage */
 INSERT INTO classes_abilities(name, level, attack_power, resources_cost, ref_class) VALUES('Frozen Spire', 1, 4, 2, 'Mage');
@@ -224,7 +224,7 @@ INSERT INTO monsters VALUES('Elder Lich', 9, 141, 130, 0, 5, 3, 9, 21, 3, 3, 0.7
 INSERT INTO monsters VALUES('Obsidian Guardian', 9, 156, 0, 98, 8, 5, 4, 27, 7, 5, 1.5);
 INSERT INTO monsters VALUES('Behemoth', 9, 174, 121, 0, 9, 7, 7, 34, 5, 5.2, 3.5);
 /* Lvl 10 */
-INSERT INTO monsters VALUES('Black Dragon', 10, 500, 1000, 0, 10, 5, 10, 55, 10, 5, 0.5);
+INSERT INTO monsters VALUES('Black Dragon', 10, 500, 1000, 0, 10, 5, 10, 40, 10, 5, 0.5);
 
 /* MONSTERS_ABILITIES */
 /* Lvl 1 */
@@ -275,9 +275,9 @@ INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, 
 INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Earth Spear', 65, 50, 85, 'Behemoth');
 INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Fire Nova', 72, 55, 15, 'Behemoth');
 /* Lvl 10 */
-INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Dragon Breath', 88, 130, 55, 'Black Dragon');
-INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Thunderstorm', 97, 150, 35, 'Black Dragon');
-INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Time Tearing', 111, 200, 10, 'Black Dragon');
+INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Dragon Breath', 80, 130, 65, 'Black Dragon');
+INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Thunderstorm', 90, 150, 25, 'Black Dragon');
+INSERT INTO monsters_abilities(name, attack_power, resources_cost, probability, ref_monster_type) VALUES('Time Tearing', 100, 200, 10, 'Black Dragon');
 
 /* GEAR */
 /* Lvl 1 */
@@ -387,9 +387,9 @@ INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(7, 'H
 INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(8, 'Mana Potion', 3, 'MP', 20);
 INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(9, 'Stamina Potion', 3, 'Stamina', 20);
 /* Lvl 4 */
-INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(10, 'Powerlful Healing Potion', 4, 'HP', 40);
-INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(11, 'Powerlful Mana Potion', 4, 'MP', 25);
-INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(12, 'Powerlful Stamina Potion', 4, 'Stamina', 25);
+INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(10, 'Powerful Healing Potion', 4, 'HP', 40);
+INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(11, 'Powerful Mana Potion', 4, 'MP', 25);
+INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(12, 'Powerful Stamina Potion', 4, 'Stamina', 25);
 /* Lvl 5 */
 INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(13, 'Major Healing Potion', 5, 'HP', 50);
 INSERT INTO potions(id_potion, name, level, stat_rest, amount_rest) VALUES(14, 'Major Mana Potion', 5, 'MP', 30);

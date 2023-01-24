@@ -1,7 +1,7 @@
 import sqlite3
 
 try:
-    print("Creating database...")
+    print("Generating dungeon... ⌛")
     dungeon_db = sqlite3.connect("sqlite/database/dungeon_rpg.db")
     cursor = dungeon_db.cursor()
     
